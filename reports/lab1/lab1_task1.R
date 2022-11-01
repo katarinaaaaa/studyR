@@ -1,4 +1,4 @@
-e1 <- read.csv('../data/lab1_e1.csv')
+e1 <- read.csv('../../data/lab1_e1.csv')
 e1
 sapply(e1, typeof)
 

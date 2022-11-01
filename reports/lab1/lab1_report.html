@@ -360,7 +360,7 @@ display: none;
 <h2>Задание 1</h2>
 <p>Считаем данные из файла и посмотрим на типы столбцов полученной
 таблицы.</p>
-<pre class="r"><code>e1 &lt;- read.csv(&#39;../data/lab1_e1.csv&#39;)
+<pre class="r"><code>e1 &lt;- read.csv(&#39;../../data/lab1_e1.csv&#39;)
 e1</code></pre>
 <pre><code>##         V1      V2       V3      V4       V5
 ## 1 -2. 5935    II 2   0.4984 ST 123E -2.154 4
@@ -407,7 +407,7 @@ e1</code></pre>
 <h2>Задание 2</h2>
 <p>Загрузим данные из файла, и посмотрим на то, в каком формате они
 хранятся.</p>
-<pre class="r"><code>load(file=&#39;../data/lab1_e2.Rdata&#39;)
+<pre class="r"><code>load(file=&#39;../../data/lab1_e2.Rdata&#39;)
 str(all_data)</code></pre>
 <pre><code>## List of 7
 ##  $ :Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;:    18 obs. of  2 variables:
@@ -434,10 +434,13 @@ str(all_data)</code></pre>
 <p>Функция, преобразующая данные к единому датафрейму со средней
 температурой пациентов, посетивших каждый из приемов, и их ID:</p>
 <pre class="r"><code>get_id &lt;- function(data) {
+  # переименуем столбцы temp датафреймов, чтобы не получить столбцы с одинаковыми названиями в объединенной таблице
+  for (i in seq(length(data))) {
+    names(data[[i]])[names(data[[i]])==&quot;temp&quot;] &lt;- paste(&quot;temp_day_&quot;, i, sep = &quot;&quot;)
+  }
   # объединим все датафреймы в один на основе столбца &quot;id&quot;
   # при значении аргумента all равном False, merge выполняет inner join, оставляя только те строки, которые присутствуют во всех датафреймах
-  # (уберем предупреждения о совпадающих названиях столбцов объединенной таблицы)
-  merged &lt;- suppressWarnings(Reduce(function(df1, df2) merge(df1, df2,  by=&quot;id&quot;), data))
+   merged &lt;- Reduce(function(df1, df2) merge(df1, df2,  by=&quot;id&quot;, all=F), data)
   # создаем новый датафрейм, содержащий столбец ID и среднее значение температуры по каждому пациенту из объединенной таблицы
   without_passes &lt;- data.frame(&quot;id&quot;=merged$id, &quot;mean_temp&quot;=rowMeans(merged[-1]))
   # возвращаем итоговый датафрейм

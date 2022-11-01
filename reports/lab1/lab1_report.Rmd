@@ -10,7 +10,7 @@ output: html_document
 Считаем данные из файла и посмотрим на типы столбцов полученной таблицы.
 
 ```{r}
-e1 <- read.csv('../data/lab1_e1.csv')
+e1 <- read.csv('../../data/lab1_e1.csv')
 e1
 sapply(e1, typeof)
 ```
@@ -50,7 +50,7 @@ sapply(e1, typeof)
 Загрузим данные из файла, и посмотрим на то, в каком формате они хранятся.
 
 ```{r}
-load(file='../data/lab1_e2.Rdata')
+load(file='../../data/lab1_e2.Rdata')
 str(all_data)
 ```
 
@@ -58,10 +58,13 @@ str(all_data)
 
 ```{r}
 get_id <- function(data) {
+  # переименуем столбцы temp датафреймов, чтобы не получить столбцы с одинаковыми названиями в объединенной таблице
+  for (i in seq(length(data))) {
+    names(data[[i]])[names(data[[i]])=="temp"] <- paste("temp_day_", i, sep = "")
+  }
   # объединим все датафреймы в один на основе столбца "id"
   # при значении аргумента all равном False, merge выполняет inner join, оставляя только те строки, которые присутствуют во всех датафреймах
-  # (уберем предупреждения о совпадающих названиях столбцов объединенной таблицы)
-  merged <- suppressWarnings(Reduce(function(df1, df2) merge(df1, df2,  by="id"), data))
+   merged <- Reduce(function(df1, df2) merge(df1, df2,  by="id", all=F), data)
   # создаем новый датафрейм, содержащий столбец ID и среднее значение температуры по каждому пациенту из объединенной таблицы
   without_passes <- data.frame("id"=merged$id, "mean_temp"=rowMeans(merged[-1]))
   # возвращаем итоговый датафрейм
